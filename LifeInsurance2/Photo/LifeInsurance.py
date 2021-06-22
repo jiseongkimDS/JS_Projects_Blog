@@ -27,19 +27,14 @@ for i in range(0, monthdiff+1, 3):
                   '&numOfRows=' + rownum + \
                   '&pageNo=' + pgnum + \
                   '&resultType=' + 'json' + \
-                  '&basYm=' + str(ymtemp) + \
-                  '&title=' + '생보_일반현황_임직원 및 설계사 현황'
+                  '&basYm=' + str(ymtemp)
     url = url + queryParams
 
     try:
         #Request & Json_Parser
         result = requests.get(url)
         json_object = json.loads(result.content)
-        df=pd.json_normalize(json_object['response']['body']['tableList'][0]['items']['item'])
-
-        # Row Selection (Remove Subsum of xcsmPlnpnDcdNm)
-        mask = df['fncoCd'].str.contains('S')
-        df = df[~mask]
+        df=pd.json_normalize(json_object)
 
         #Append
         ResultMonths.append(df)
@@ -51,8 +46,5 @@ for i in range(0, monthdiff+1, 3):
 #Join
 result = pd.concat(ResultMonths)
 
-#Column Rename
-result.columns = ['날짜','법인등록번호','고유번호','기업명','직원수','직급구분','직급']
-
 #To_CSV
-result.to_csv('LifeInsurance_PowerBI.csv',encoding='euc-kr')
+result.to_csv('LifeInsurance_PowerBI3.csv',encoding='euc-kr')
