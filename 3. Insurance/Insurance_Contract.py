@@ -22,19 +22,24 @@ for i in range(0, monthdiff+1, 3):
     ymtemp = dt.strftime(ymtemp,'%Y%m')
 
     # References
-    url = 'http://apis.data.go.kr/1160100/service/GetLifeInsuCompInfoService/getLifeInsuCompGeneInfo'
+    url =  'http://apis.data.go.kr/1160100/service/GetLifeInsuCompInfoService/getLifeInsuCompMajoBusiActi'
     queryParams = '?' + 'ServiceKey=' + 'SzfcS4DsKYQpTde0nf0wDoNDomO7hBvjakHgeNqSGwh0USlMlVeywpcOhL2mA5MwxGryRC238PEOnIdUJSsgQA%3D%3D' + \
                   '&numOfRows=' + rownum + \
                   '&pageNo=' + pgnum + \
                   '&resultType=' + 'json' + \
-                  '&basYm=' + str(ymtemp)
+                  '&basYm=' + str(ymtemp) + \
+                  '&title=' + '생보_주요영업활동_신계약'
     url = url + queryParams
 
     try:
         #Request & Json_Parser
         result = requests.get(url)
         json_object = json.loads(result.content)
-        df=pd.json_normalize(json_object)
+        df=pd.json_normalize(json_object['response']['body']['tableList'][0]['items']['item'])
+
+        # Row Selection (Remove Subsum of xcsmPlnpnDcdNm)
+        mask = df['fncoCd'].str.contains('S')
+        df = df[~mask]
 
         #Append
         ResultMonths.append(df)
@@ -46,5 +51,8 @@ for i in range(0, monthdiff+1, 3):
 #Join
 result = pd.concat(ResultMonths)
 
+#Column Rename
+#result.columns = ['날짜','법인등록번호','고유번호','기업명','직원수','직급구분','직급']
+
 #To_CSV
-result.to_csv('LifeInsurance_PowerBI3.csv',encoding='euc-kr')
+result.to_csv('Insurance_Contract_PowerBI.csv',encoding='euc-kr')
