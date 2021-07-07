@@ -22,8 +22,11 @@ result = requests.get(url)
 json_object = json.loads(result.content)
 df=pd.json_normalize(json_object['getInsurgTrgetFnltInfoList']['item'])
 
-#Column Rename
-#df.columns = ['부보대상여부', '회사명', '']
+# Column Selection
+df = df.loc[:, ['fnccmpNm','fncsecDscdNm','hmpgUrladr','fncIstAdr','cttpc']]
+
+#Rename Column
+df.columns = ['회사명','금융권','홈페이지','주소','전화번호']
 
 #To_CSV
-df.to_csv('Insurance_Deposit_Financial_Company_PowerBI.csv',encoding='euc-kr')
+df.to_csv('Insurance_Deposit_Financial_Company_PowerBI_test.csv',encoding='euc-kr')
